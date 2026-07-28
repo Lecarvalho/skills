@@ -1,0 +1,8 @@
+# This repo is cloned directly into ~/.claude/skills, so local-only skills and
+# Claude Code's own state live alongside the tracked ones. Keep them untracked.
+
+trello-cli/
+
+# Claude Code state that may appear in the skills directory
+.DS_Store
+Thumbs.db

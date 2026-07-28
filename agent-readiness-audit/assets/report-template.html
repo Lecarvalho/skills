@@ -1,19 +1,26 @@
 <!--
-  AGENT-READINESS AUDIT — report template
+  STRUCTURAL AUDIT — report template (both modes)
 
   Copy this file, then replace every {{PLACEHOLDER}} and the example content.
   Do NOT modify the <style> block: the status palette is validated (see SKILL.md).
 
-  Score-dependent classes — pick per principle:
-    8-10  class="fill-good" / "txt-good"  · pill text "Strong"
-    6-7   class="fill-warn" / "txt-warn"  · pill text "Adequate"
-    0-5   class="fill-bad"  / "txt-bad"   · pill text "Weak"
+  {{MODE_*}} placeholders switch the report between the two rubrics. Fill them
+  from the "Template swaps" table in SKILL.md. Everything else is mode-neutral.
+
+  Score-dependent classes — pick per principle. POLARITY IS THE SAME IN BOTH
+  MODES: high is good. In overengineering mode 10 = proportionate, 0 = severely
+  overengineered, so green still means "good" and the headline is a
+  PROPORTIONALITY score. Do not invert the palette.
+
+    8-10  class="fill-good" / "txt-good"  · pill "Strong"   | "Proportionate"
+    6-7   class="fill-warn" / "txt-warn"  · pill "Adequate" | "Tolerable"
+    0-5   class="fill-bad"  / "txt-bad"   · pill "Weak"     | "Overengineered"
   Meter width is score x 10%  (7 -> width:70%).
 
   Color is never the sole encoding: every meter carries a numeric score AND a
   text band label. Keep both.
 -->
-<title>{{REPO_NAME}} — Agent-Readiness Audit</title>
+<title>{{REPO_NAME}} — {{MODE_TITLE}}</title>
 <style>
   :root {
     --surface: #fcfcfb;
@@ -143,12 +150,11 @@
 
 <header class="masthead">
   <div class="eyebrow">Structural audit · {{DATE}}</div>
-  <h1>{{REPO_NAME}} — agent-readiness scorecard</h1>
+  <h1>{{REPO_NAME}} — {{MODE_HEADING}}</h1>
   <p class="sub">
-    <span class="path">{{REPO_PATH}}</span> scored against ten structural principles for
-    codebases that coding agents have to work in at scale. Scores reflect how cheaply an
-    agent can locate relevant code, predict its constraints, and verify a change — not
-    code quality, correctness, or product maturity.
+    <span class="path">{{REPO_PATH}}</span> {{MODE_SUBTITLE}} — not code quality,
+    correctness, or product maturity.
+    <!-- Overengineering mode: add repo kind, age, and history confidence here. -->
   </p>
 
   <div class="hero">
@@ -161,8 +167,8 @@
   </div>
 </header>
 
-<h2>Scorecard</h2>
-<p class="section-note">Ten principles, 0–10 each. Bands: 8–10 strong, 6–7 adequate, 0–5 weak.</p>
+<h2>{{Scorecard | Proportionality scorecard}}</h2>
+<p class="section-note">Ten principles, 0–10 each. Bands: {{MODE_BANDS}}.</p>
 
 <div class="scroller" style="margin-bottom:2rem">
 <table>
@@ -179,10 +185,17 @@
       <td><span class="pill txt-good">Strong</span></td>
       <td>Gitignored, header-marked, lint-excluded, and drift-gated. Near-ideal</td>
     </tr>
-    <!-- ... one row per principle: 1 Organize around behavior · 2 Explicit, enforced
-         dependencies · 3 Names own concepts · 4 One canonical workflow · 5 Instructions
-         close to code · 6 Tests mirror behavior · 7 Generated/external separated ·
-         8 One live implementation · 9 Consistency · 10 Right-sized files -->
+    <!-- ... one row per principle.
+
+         READINESS: 1 Organize around behavior · 2 Explicit, enforced dependencies ·
+         3 Names own concepts · 4 One canonical workflow · 5 Instructions close to code ·
+         6 Tests mirror behavior · 7 Generated/external separated · 8 One live
+         implementation · 9 Consistency · 10 Right-sized files
+
+         OVERENGINEERING: 1 Abstractions have 2+ occupants · 2 Indirection carries logic ·
+         3 Configuration is configured · 4 Generality has a second caller ·
+         5 Infrastructure matches load · 6 Change is local · 7 Data models transform ·
+         8 Ceremony pays for itself · 9 Seams on the real axis · 10 Surface is reachable -->
   </tbody>
 </table>
 </div>
@@ -205,8 +218,10 @@
     <div class="keeps"><h4>Working</h4><ul>
       <li>{{Evidence with a <span class="path">path</span>, a count, or a quoted rule}}</li>
     </ul></div>
-    <div class="gaps"><h4>Costing {{searches | verification | the feedback loop | correctness | context | predictability | retrieval | pattern-matching}}</h4><ul>
+    <div class="gaps"><h4>Costing {{searches | verification | the feedback loop | correctness | context | predictability | retrieval | pattern-matching | every read | every new field | every new feature}}</h4><ul>
       <li>{{Evidence. <strong>Bold the claim</strong>, then the number or path that proves it}}</li>
+      <!-- Overengineering mode: state the failed falsification test here — e.g.
+           "one implementation, no second in the tree, none in issues or TODOs". -->
     </ul></div>
   </div>
 
@@ -239,6 +254,20 @@
 </table>
 </div>
 
+<!-- ===== OVERENGINEERING MODE ONLY — required, do not omit =====
+     The counterweight. Without it the report reads as an argument for minimalism,
+     which is a different and equally wrong position. If the sweeps found no
+     under-engineering, keep the section and say so explicitly.
+<h2>Where the repo is under-engineered</h2>
+<p class="section-note">The counterweight: duplication and missing seams found by the same sweeps. Proportionality cuts both ways.</p>
+<div class="card">
+  <p class="verdict">{{What was found, or an explicit "the sweeps found none".}}</p>
+  <ul>
+    <li>{{Evidence with a <span class="path">path</span> and a count}}</li>
+  </ul>
+</div>
+===== END OVERENGINEERING-ONLY SECTION ===== -->
+
 <h2>Reading the result</h2>
 <p style="color:var(--ink-2); max-width:46rem">
   {{The single pattern that explains the score spread. Most often: every principle scored
@@ -253,10 +282,10 @@
 <footer>
   <p><strong>Method</strong></p>
   <ol class="method">
-    <li>Direct inspection of the working tree at <span class="path">{{REPO_PATH}}</span> on {{DATE}} — directory structure, filename sweeps, line-count distribution, lint and CI configuration, boundary tests, and the instruction layer.</li>
-    <li>Ten principles scored 0–10 against the agent-readiness rubric; the headline is their unweighted sum.</li>
+    <li>Direct inspection of the working tree at <span class="path">{{REPO_PATH}}</span> on {{DATE}} — {{MODE_METHOD}}.</li>
+    <li>Ten principles {{MODE_RUBRIC_LINE}}; the headline is their unweighted sum.</li>
     <li>Excluded from all counts: {{node_modules/, bin/, obj/, dist/, vendor/}}, and generated output.</li>
-    <li><strong>Not assessed:</strong> code correctness, test quality or coverage depth, runtime behavior, security, performance, or product fit. This audit measures structural legibility only — how cheaply an agent can find, predict, and verify. A codebase can score 100 here and still be wrong.</li>
+    <li><strong>Not assessed:</strong> code correctness, test quality or coverage depth, runtime behavior, security, performance, or product fit. This audit {{MODE_NOT_ASSESSED}}. A codebase can score 100 here and still be wrong.</li>
   </ol>
 </footer>
 
