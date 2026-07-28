@@ -1,10 +1,11 @@
-# claude-skills
+# skills
 
-Skills for [Claude Code](https://claude.com/claude-code).
+Reusable procedures for coding agents — Claude Code, Codex, and anything else that can
+read a folder of instructions.
 
-A skill is a folder of instructions Claude loads on demand when a task matches its
-description — it replaces Claude's default approach for that kind of work with a
-specific procedure, reference material, and assets.
+A skill is a procedure plus its reference material: what to do, in what order, measured
+against what standard. The content is agent-agnostic; only the packaging differs per
+runtime (see [Install](#install)).
 
 ## Skills
 
@@ -38,7 +39,7 @@ with a scorecard, per-principle findings with file paths and counts, and a remed
 list ranked by payoff per hour rather than by severity. It responds to both
 `prefers-color-scheme` and an explicit theme attribute.
 
-**Usage** — `/agent-readiness-audit`, or just ask:
+**Usage** — invoke by name, or just ask:
 
 ```
 audit C:\path\to\repo for agent-readiness
@@ -65,16 +66,35 @@ score and a text band label. If you change the hex values, re-validate.
 
 ## Install
 
-Clone into your personal skills directory, where skills are available in every project:
+The skill body is plain Markdown and works with any agent that can be pointed at it.
+What differs is how each runtime discovers it.
+
+**Claude Code** — copy into the personal skills directory, where it's available in every
+project. It's picked up on the next session; no registration step.
 
 ```bash
-git clone https://github.com/Lecarvalho/claude-skills.git
-cp -r claude-skills/skills/agent-readiness-audit ~/.claude/skills/
+git clone https://github.com/Lecarvalho/skills.git
+cp -r skills/skills/agent-readiness-audit ~/.claude/skills/
 ```
 
 On Windows that target is `%USERPROFILE%\.claude\skills\`. For a single project instead,
-copy into `.claude/skills/` at the repo root. Claude Code picks skills up on the next
-session — no registration step.
+copy into `.claude/skills/` at the repo root.
+
+**Codex** — Codex has no skills directory. Either reference the procedure from your
+`AGENTS.md`:
+
+```markdown
+| Read this | When |
+|---|---|
+| `skills/agent-readiness-audit/SKILL.md` | Auditing a repo for agent-readiness |
+```
+
+...or copy `SKILL.md`'s body into `~/.codex/prompts/agent-readiness-audit.md` to invoke
+it as a slash command. In both cases keep `references/` and `assets/` beside it — the
+procedure loads them by relative path.
+
+**Anything else** — point the agent at `SKILL.md` and let it follow the steps. The YAML
+frontmatter is Claude Code's discovery metadata and is inert everywhere else.
 
 ## License
 
