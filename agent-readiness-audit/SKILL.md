@@ -99,7 +99,8 @@ Rules for this step, both modes:
 - **Quote the repo against itself when it self-documents a problem.** A comment
   acknowledging a workaround is the strongest possible evidence and belongs in a
   blockquote in the report.
-- Do not spawn subagents unless the user asks for it.
+- **Solo by default.** Spawn subagents only as described in *Solo or fan-out* below —
+  for context capacity on large repos, never for speed or economy.
 
 Additionally, in **overengineering mode**:
 
@@ -114,6 +115,53 @@ Additionally, in **overengineering mode**:
 - **Record under-engineering as you go.** Duplication, missing seams, copy-paste. It goes
   in the report as an explicit counterweight (see step 4), so the recommendation reads as
   proportionality rather than minimalism.
+
+#### Solo or fan-out — decide after the orient sweep
+
+Subagents always cost more total tokens — each pays its own setup and its slice of the
+rubric. What they buy is context capacity: on a large repo, a solo audit fills its
+context with sweep output and file reads before it ever scores, and evidence quality
+degrades quietly into skimming. So spawn for capacity, never for speed. The orient sweep
+already counts source files; decide there.
+
+| Repo | Path |
+|---|---|
+| < ~100 source files | Solo, with the small-repo leniency note (see *Scope assumption*) |
+| Up to ~1,500 source files, single stack | Solo — the procedure above, unchanged |
+| > ~1,500 source files, or ≥2 distinct stacks/tiers at any size | Fan out (below) |
+
+In overengineering mode drop the fan-out threshold to ~1,000 — history output is bulky.
+The numbers are proxies, not laws: the honest test is whether sweeps plus file reads
+will fit in roughly half the context, leaving room to score and write the report.
+Multi-stack monorepos hit the wall at half the count because tiers are evidenced
+separately and scored as a composite.
+
+User overrides: `--deep` forces fan-out at any size; `--solo` forces a single context at
+any size. If the harness has no way to spawn subagents, run solo regardless and state in
+the footer that evidence was gathered under a context ceiling.
+
+**Fan-out shape.** The orchestrator stays the auditor; subagents are evidence gatherers.
+
+1. The orchestrator itself runs step 0, fixes the exclusion list, determines kind and
+   age, and — in overengineering mode — builds the 12-month heat list. This groundwork
+   feeds every cluster; do it once and pass it down.
+2. Dispatch 3–4 subagents clustered by **data source, not by principle** — one owns
+   directory structure and filename sweeps, one owns configs and CI, one owns the source
+   files the rubric requires actually reading, one (overengineering mode) owns git
+   history. Each source is read once, by the agent that owns it, and answers every
+   principle whose sweeps draw on it. One agent per principle is the wrong cut — ten
+   agents re-running the shared groundwork and re-reading the same files.
+3. Each subagent gets the sweeps it owns from the mode's evidence file, the groundwork
+   from step 1, and the repo path. It returns counted evidence only — numbers, paths,
+   quoted lines, counter-check results. Never scores, never verdicts.
+4. Scoring, the under-engineering counterweight, the synthesis sections, and the report
+   remain the orchestrator's alone. Cross-principle judgment — the single pattern behind
+   the scores, composite tier scoring, calibrated low scores — does not survive being
+   split ten ways.
+
+Run evidence subagents at low reasoning effort where the harness offers the knob — the
+work is mechanical grep-and-count. Keep the orchestrator at full effort for scoring and
+writing. Inherit the session model everywhere; do not pick models per subagent.
 
 ### 3. Score
 
