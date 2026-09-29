@@ -70,10 +70,12 @@ that the repo is maximally overengineered. Every report carries a required
 *under-engineering* section as a counterweight, so the recommendation reads as
 proportionality rather than minimalism.
 
-Output in both modes is a single self-contained HTML file — no external fonts, scripts, or images —
-with a scorecard, per-principle findings with file paths and counts, and a remediation
-list ranked by payoff per hour rather than by severity. It responds to both
-`prefers-color-scheme` and an explicit theme attribute.
+Output in both modes is a single self-contained, visual HTML file. Each issue is drawn as
+problem → solution side by side (files as squares, folders, dependency arrows, check
+tiles), with the principle's score beside it and a copy-ready prompt that fixes only
+that issue. A fix plan ranked by payoff per hour links to each block, and the report
+closes with the repo's folder tree today next to the tree after every fix. It responds
+to both `prefers-color-scheme` and an explicit theme attribute.
 
 **Usage** — invoke by name, or just ask:
 
@@ -101,7 +103,7 @@ agent-readiness-audit/
     principles.md                     the ten proportionality principles + the falsification test
     evidence.md                       history-first sweeps, each with its counter-check
     scoring.md                        0–10 anchors, polarity, heat weighting, confidence rules
-  assets/report-template.html         report skeleton with a validated palette (both modes)
+  assets/report-template.html         visual report skeleton + component catalog (both modes)
 ```
 
 The filenames are identical across the two rubric folders; only the parent differs. Read
@@ -109,8 +111,8 @@ from one folder for the whole audit — mixing them produces a report whose scor
 match its rubric.
 
 The report's status palette was validated for colorblind separation and contrast in both
-light and dark modes. Color is never the sole encoding — every meter carries a numeric
-score and a text band label. If you change the hex values, re-validate.
+light and dark modes. Color is never the sole encoding — every score carries its number
+and a text band word, and every colored group is labeled with a name and count. If you change the hex values, re-validate.
 
 ## Install
 

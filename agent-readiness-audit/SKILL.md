@@ -101,6 +101,19 @@ Rules for this step, both modes:
   blockquote in the report.
 - **Solo by default.** Spawn subagents only as described in *Solo or fan-out* below —
   for context capacity on large repos, never for speed or economy.
+- **Collect the numbers the visuals need** while the sweeps run (the report is drawn,
+  not written — see step 4):
+  - a top-level tree from `git ls-files`: folders with file counts, two levels deep, plus
+    any flat folder's direct-file count;
+  - for each flat or mixed folder, its files grouped by filename prefix or role, with
+    counts (these become the colored squares);
+  - per feature, the number of directories it spans;
+  - ratios: source files with a same-name test, files near the size cap, checks each
+    documented command actually runs;
+  - import-edge counts between the areas you will draw in a dependency diagram.
+
+  Never invent a count for the target state. Where a future number is an estimate,
+  mark it `~`; where nothing supports one, draw the folder without a count.
 
 Additionally, in **overengineering mode**:
 
@@ -181,42 +194,98 @@ genuine under-abstraction, and name it.
 
 ### 4. Write the report
 
-Copy `assets/report-template.html` and fill it in. Structure, in order:
+The report is **drawn, not written**. A reader should grasp each issue from shapes,
+counts, and colors in a few seconds, then read at most a line or two. Copy
+`assets/report-template.html`, follow its comments, and build every visual from the
+component catalog at the bottom of that file. Structure, in order:
 
-1. **Masthead** — repo path, date, hero score, and a two-line framing of where the deficit
-   is concentrated. In overengineering mode, also state repo kind, age, and history
-   confidence here.
-2. **Scorecard table** — all ten with score, band pill, and a one-line verdict each.
-3. **Findings by principle** — one card per principle: verdict paragraph, then a two-column
-   `Working` / `Costing …` split. The right-hand heading names the *cost*, not the
-   problem: "Costing searches", "Costing verification", "Costing every read".
-4. **What to fix, in order** — ranked by payoff per hour, *not* by score. Each row: action,
-   principles addressed, rough effort, and why it sits at that rank. Cheap high-leverage
-   fixes come before expensive high-score ones. Anything measured in weeks goes last with
-   an explicit "defer this" note.
-5. **Reading the result** — two short paragraphs naming the single pattern that explains
-   the scores.
-6. **Footer** — method, and the explicit not-assessed list.
+1. **Masthead** — a score gauge, a one-line headline verdict, one sentence naming the
+   single pattern behind the scores, and a two-box split: what scores high and why
+   (green) next to what scores low and why (red), 3–4 short items each. Chips for size,
+   commits, and stacks. In overengineering mode, add chips for repo kind, age, and
+   history confidence. This split is where the report names the pattern behind the scores.
+2. **Scorecard** — ten bars sorted by score, a dashed line at 6, each tagged with what
+   enforces the principle (or what it lacks). A divider falls where the masthead's split
+   falls. Each principle name links to its home strip.
+3. **Issue sections** — 2–4 themed sections, each a stack of **problem → solution
+   blocks** (`.pair`). One block per issue:
+   - a header: issue title, fix number, effort, principles the fix improves;
+   - the **principle strip** for each principle whose home is this block: score, band,
+     2–3 key numbers, then ✓ what works and ✗ costs the visual does *not* already show;
+   - the **problem** (red) and the **solution** (green) side by side, drawn with the
+     *same* component so the change is visible: squares regrouped into folders, a red
+     dashed arrow turned green, check tiles lit, a list of 166 plus 5 outside becoming
+     one glob;
+   - a collapsed **prompt** with a Copy button that fixes only this issue (see *Fix
+     prompts*).
+4. **Fix order** — four lanes (quick wins, cleanups, restructure, defer), ranked by
+   payoff per hour, *not* by score. Each task shows its number, a ≤ 8-word action,
+   effort, and principles, and links to its block. Highlight the one or two highest-
+   leverage tasks. Anything measured in weeks goes in *Defer*. Below the lanes, one
+   warning box: a half-finished version of the biggest restructure is worse than not
+   starting.
+5. **Whole repo: today → after all fixes** — two folder trees side by side, built from
+   `git ls-files` counts. Folders, not files: 20–35 lines per side, same order on both
+   sides, unchanged folders left out. Red lines are problems today, green lines are new
+   or moved, and each changed line carries a badge linking to its fix. Close with 3–5
+   before → after numbers ("95 → 3 loose files in monitor/").
+6. **Footer** — method and the explicit not-assessed list, collapsed.
 
-**Overengineering mode adds one required section**, between 4 and 5:
+**Every principle has exactly one home.** Assign each of the ten principles to the one
+block where its main issue is drawn, and put its strip there only. A principle whose fix
+spans several blocks still has one strip; the other blocks list it in their header
+chips. A strong principle with nothing to fix still gets a block: fixtag "No fix
+needed", the problem side titled "Watch", and no prompt. Never add a separate
+per-principle section — it repeats the issue blocks.
+
+**Overengineering mode adds one required block** to the issue sections:
 
 > **Where the repo is *under*-engineered** — the counterweight. Duplication, missing
-> seams, and copy-paste found during the sweeps, with paths and counts. If the sweeps
-> found none, say that explicitly. Without this section the report reads as an argument
-> for minimalism, which is a different and equally wrong position.
+> seams, and copy-paste found during the sweeps, drawn as squares with paths and counts,
+> with fixtag "Counterweight". If the sweeps found none, keep the block and say so.
+> Without it the report reads as an argument for minimalism, which is a different and
+> equally wrong position.
 
 Writing rules:
 
-- Every finding carries a path, a count, or a quote. No unsupported adjectives.
-- Lead each card's "Working" column honestly — if a tier is genuinely excellent, say so
-  plainly. A report that only criticizes gets discounted.
-- Effort estimates in hours/days. They make the fix list actionable and force honesty
-  about which items are real projects.
-- The last remediation row is usually the biggest restructure. Flag that a half-finished
-  version of it is worse than not starting.
+- **Text budget.** No paragraphs. A strip line or kpi is ≤ 12 words; a section lede is
+  one line; a masthead split item is ≤ 6 words. If something needs a sentence, it
+  probably needs a visual instead.
+- **Numbers carry the claim.** Every visual and every line traces to a count, a path,
+  or a quote. No unsupported adjectives. Each color group in a square grid has a key
+  with its name and count.
+- **Don't say it twice.** A cost drawn in the problem panel doesn't reappear as a ✗
+  line, and nothing in the issue blocks is restated elsewhere.
+- **Don't invent the future.** Target-state panels use real counts where the move is
+  mechanical (a vendor split, a desktop split). Otherwise draw folders without counts,
+  or mark estimates with `~`.
+- Lead each strip honestly with what works — if a tier is genuinely excellent, say so.
+  A report that only criticizes gets discounted.
+- When the repo documents its own problem (a comment, a doc line that code
+  contradicts), quote it in the problem panel with the `.claim` component.
+- Effort estimates in hours or days. They make the fix list actionable and force
+  honesty about which items are real projects.
 - In overengineering mode, prefer **"re-cut"** to **"delete"** for P9 findings, and be
   explicit that the recommendation is never a rewrite. If the fix list reads as
   "restructure the codebase," it has drifted from the evidence.
+
+#### Fix prompts
+
+Each block's prompt is pasted into a fresh agent session in the audited repo, with no
+report attached. It must stand alone:
+
+- **State the problem with its evidence** — the exact paths, counts, names, and quoted
+  lines from the audit — so the agent doesn't re-audit.
+- **State the target** concretely: the folder names, the rule text, the command.
+- **Bound the scope**: fix only this issue, no behavior changes, name what not to touch.
+- **Gate risky moves.** For moves, deletions, or restructures, the agent first shows a
+  plan or file mapping and waits for approval. For a deletion that rests on a claim
+  ("nothing enables this"), the agent verifies the claim first and stops if it's false.
+- **Name prerequisites** by content, not just number: "do the glob test runner fix
+  first", not only "do #1 first".
+- **End with verification**: the repo's canonical verify command passes, and any new
+  rule is proven by a deliberate violation that is then reverted.
+- Plain prose and short numbered steps. No report jargon ("P4", "pair").
 
 ### 5. Deliver
 
@@ -230,7 +299,7 @@ Write the file to the **current working directory**, unless the user names a loc
 Don't write into the audited repo unprompted — an audit is not something to leave lying
 in someone else's tree. State the full output path when reporting.
 
-Then report, in chat: the headline score, the scorecard table, and the three findings
+Then report, in chat: the headline score, the scorecard table, and the three fixes
 worth acting on first. Don't restate the whole report — it's in the file.
 
 Then offer to publish it as an Artifact for a shareable link. Do not publish
@@ -239,13 +308,13 @@ give it a URL is the user's.
 
 ## Visual spec (do not re-derive)
 
-`assets/report-template.html` already carries a validated palette. Reuse it as-is, in both
-modes.
+`assets/report-template.html` already carries a validated palette and every component
+the report needs. Reuse it as-is, in both modes. Do not restyle it.
 
 The status colors were checked with the `dataviz` skill's `validate_palette.js` in both
 modes and pass the lightness band, chroma floor, normal-vision floor, and contrast checks.
-The one CVD warning (green↔amber, ΔE 6.8–7.9) is legal **only because every meter carries
-a numeric score and a text band label** — color is never the sole encoding. If you change
+The one CVD warning (green↔amber, ΔE 6.8–7.9) is legal **only because every score carries
+its number and a text band word** — color is never the sole encoding. If you change
 these hex values you must re-run the validator and keep the secondary encoding.
 
 | Role | Light | Dark |
@@ -255,29 +324,38 @@ these hex values you must re-run the validator and keep the secondary encoding.
 | Weak / Overengineered (0–5) | `#b83a4c` | `#d1495b` |
 | Surface | `#fcfcfb` | `#1a1a19` |
 
-Other constraints, all already in the template: fully self-contained (no external fonts,
-scripts, or images); responds to `prefers-color-scheme` **and** to `:root[data-theme]`
-so a viewer toggle wins in both directions; tables live in `.scroller` wrappers so wide
-content scrolls inside itself and the page body never scrolls horizontally.
+Two further color sets are in the template, and neither is used alone to carry meaning:
+
+- **Tints** (`--good-bg`, `--warn-bg`, `--bad-bg`) are panel backgrounds for problem and
+  solution sides. Each panel also carries a "Problem" or "Solution" label.
+- **Categories** (`--c1`–`--c5`, `--c0` for "other") color square groups by filename
+  prefix or role. Every group is named with its count in a `.keys` legend next to it.
+
+Other constraints, all already in the template: self-contained (no external fonts,
+scripts, stylesheets, or images; one small inline script draws the squares and wires the
+Copy buttons); responds to `prefers-color-scheme` **and** to `:root[data-theme]` so a
+viewer toggle wins in both directions; every side-by-side layout collapses to one column
+under 760px, with the arrow turned downward, so the page body never scrolls
+horizontally.
 
 ### Template swaps for overengineering mode
 
 The template carries `{{MODE_*}}` placeholders. Fill them per mode — everything else in
-the template is mode-neutral. Do not restyle anything.
+the template is mode-neutral.
 
 | Placeholder | Readiness | Overengineering |
 |---|---|---|
 | `{{MODE_TITLE}}` | `Agent-Readiness Audit` | `Overengineering Audit` |
-| `{{MODE_HEADING}}` | `agent-readiness scorecard` | `proportionality scorecard` |
-| `{{MODE_SUBTITLE}}` | scored against ten structural principles for codebases that coding agents work in at scale; scores reflect how cheaply an agent can locate, predict, and verify | scored against ten principles of proportionate structure; scores reflect whether the repo's abstraction, indirection, and infrastructure are paid for by the work it actually does |
-| `{{MODE_BANDS}}` | `8–10 strong, 6–7 adequate, 0–5 weak` | `8–10 proportionate, 6–7 tolerable, 0–5 overengineered` |
+| `{{MODE_SPLIT_GOOD}}` | `Machine-checked` | `Earned: variation absorbed` |
+| `{{MODE_SPLIT_BAD}}` | `Convention only` | `Unearned: no second case` |
+| `{{MODE_TAG_NOTE}}` | `The tag shows what enforces the principle, or "convention" if nothing does.` | `The tag names the variation the structure absorbs, or what it is missing.` |
+| `{{MODE_BANDS_GOOD}}` / `_WARN` / `_BAD` | `8–10 strong` · `6–7 adequate` · `0–5 weak` | `8–10 proportionate` · `6–7 tolerable` · `0–5 overengineered` |
 | `{{MODE_METHOD}}` | directory structure, filename sweeps, line-count distribution, lint and CI configuration, boundary tests, and the instruction layer | abstraction/implementation counts, call-path tracing, configuration variance, subscriber counts, model field diffs, and 12-month change history |
 | `{{MODE_RUBRIC_LINE}}` | scored against the agent-readiness rubric | scored against the proportionality rubric; **high is good — 100 means fully earned structure, not maximum overengineering** |
 | `{{MODE_NOT_ASSESSED}}` | measures structural legibility only — how cheaply an agent can find, predict, and verify | measures proportionality of structure only — not correctness, not whether the architecture is otherwise sound. It is not an argument for minimalism: under-engineering is called out separately |
 
-Also, in overengineering mode: retitle the scorecard section **Proportionality scorecard**,
-and add the required under-engineering section as one more `.card` block before
-*Reading the result*.
+Also, in overengineering mode: title the scorecard section **Proportionality scorecard**,
+and add the required counterweight block to the issue sections, before *Fix order*.
 
 ## Reference files
 
@@ -297,4 +375,4 @@ assets/
 | `references/overengineering/principles.md` | Overengineering | The ten proportionality principles, the falsification test, and the three costs. |
 | `references/overengineering/evidence.md` | Overengineering | Sweeps per principle, history-first, each with its counter-check. |
 | `references/overengineering/scoring.md` | Overengineering | Per-principle 0–10 bands, polarity, heat weighting, confidence rules. |
-| `assets/report-template.html` | Both | The report skeleton — validated palette, card and table components. |
+| `assets/report-template.html` | Both | The visual report skeleton — validated palette, problem → solution blocks, component catalog, whole-repo trees. |

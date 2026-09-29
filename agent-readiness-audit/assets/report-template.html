@@ -1,57 +1,54 @@
 <!--
   STRUCTURAL AUDIT — report template (both modes)
 
-  Copy this file, then replace every {{PLACEHOLDER}} and the example content.
-  Do NOT modify the <style> block: the status palette is validated (see SKILL.md).
+  A VISUAL report. The reader should understand each issue from shapes, counts, and
+  colors before reading a sentence. Text is labels, numbers, and one-line claims.
 
-  {{MODE_*}} placeholders switch the report between the two rubrics. Fill them
-  from the "Template swaps" table in SKILL.md. Everything else is mode-neutral.
+  Copy this file, replace every {{PLACEHOLDER}}, and replace every block marked
+  EXAMPLE with the audit's own content. Keep the <style> and <script> blocks as they
+  are: the status palette is validated (see SKILL.md, "Visual spec").
 
-  Score-dependent classes — pick per principle. POLARITY IS THE SAME IN BOTH
-  MODES: high is good. In overengineering mode 10 = proportionate, 0 = severely
-  overengineered, so green still means "good" and the headline is a
-  PROPORTIONALITY score. Do not invert the palette.
+  Page structure, in order:
+    1. Masthead        gauge + one-line verdict + the two-sided split
+    2. Scorecard       bars, sorted by score, tagged with what enforces each principle
+    3. Issue sections  2–4 themed sections of problem → solution blocks (.pair)
+                       Each principle appears EXACTLY ONCE, as a .pstrip in its home block.
+    4. Fix order       lanes: quick wins / cleanups / restructure / defer, linked to blocks
+    5. Whole repo      today's tree next to the tree after every fix
+    6. Footer          method and not-assessed list, collapsed
 
-    8-10  class="fill-good" / "txt-good"  · pill "Strong"   | "Proportionate"
-    6-7   class="fill-warn" / "txt-warn"  · pill "Adequate" | "Tolerable"
-    0-5   class="fill-bad"  / "txt-bad"   · pill "Weak"     | "Overengineered"
-  Meter width is score x 10%  (7 -> width:70%).
+  {{MODE_*}} placeholders switch the report between the two rubrics. Fill them from the
+  "Template swaps" table in SKILL.md.
 
-  Color is never the sole encoding: every meter carries a numeric score AND a
-  text band label. Keep both.
+  Score classes — POLARITY IS THE SAME IN BOTH MODES: high is good.
+    8-10  good · "Strong"   | "Proportionate"
+    6-7   warn · "Adequate" | "Tolerable"
+    0-5   bad  · "Weak"     | "Overengineered"
+  Bar width is score x 10%. Gauge arc: stroke-dasharray="{{TOTAL*4.398}} 439.8".
+
+  Color is never the sole encoding: every score carries its number and band word, every
+  colored square group carries a key with a name and a count.
 -->
-<title>{{REPO_NAME}} — {{MODE_TITLE}}</title>
+<title>{{REPO_NAME}} {{MODE_TITLE}}</title>
 <style>
   :root {
-    --surface: #fcfcfb;
-    --panel: #ffffff;
-    --panel-2: #f5f5f3;
-    --ink: #16161a;
-    --ink-2: #4a4a52;
-    --ink-3: #7b7b85;
-    --rule: #e2e2dd;
-    --rule-2: #cfcfc8;
-    --good: #1a8a5e;
-    --warn: #a8761f;
-    --bad: #b83a4c;
-    --track: #e7e7e2;
+    --surface: #fcfcfb; --panel: #ffffff; --panel-2: #f5f5f3;
+    --ink: #16161a; --ink-2: #4a4a52; --ink-3: #7b7b85;
+    --rule: #e2e2dd; --rule-2: #cfcfc8;
+    --good: #1a8a5e; --warn: #a8761f; --bad: #b83a4c; --track: #e7e7e2;
+    --good-bg: #e6f3ed; --warn-bg: #f7efe0; --bad-bg: #f7e6e9;
+    --c1: #3b6fd4; --c2: #8a5cc9; --c3: #1f9aa8; --c4: #c26a2e; --c5: #5f8f2f; --c0: #c9c9c2;
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
     --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
-      --surface: #1a1a19;
-      --panel: #212120;
-      --panel-2: #262625;
-      --ink: #f0f0ec;
-      --ink-2: #b4b4ae;
-      --ink-3: #85857e;
-      --rule: #333331;
-      --rule-2: #45453f;
-      --good: #3d9970;
-      --warn: #b8842a;
-      --bad: #d1495b;
-      --track: #313130;
+    :root:not([data-theme="light"]) {
+      --surface: #1a1a19; --panel: #212120; --panel-2: #262625;
+      --ink: #f0f0ec; --ink-2: #b4b4ae; --ink-3: #85857e;
+      --rule: #333331; --rule-2: #45453f;
+      --good: #3d9970; --warn: #b8842a; --bad: #d1495b; --track: #313130;
+      --good-bg: #1f3329; --warn-bg: #362d1d; --bad-bg: #3a2126;
+      --c1: #6d97e8; --c2: #a887dc; --c3: #45b8c4; --c4: #dc8a52; --c5: #86b556; --c0: #4a4a45;
     }
   }
   :root[data-theme="dark"] {
@@ -59,234 +56,466 @@
     --ink: #f0f0ec; --ink-2: #b4b4ae; --ink-3: #85857e;
     --rule: #333331; --rule-2: #45453f;
     --good: #3d9970; --warn: #b8842a; --bad: #d1495b; --track: #313130;
+    --good-bg: #1f3329; --warn-bg: #362d1d; --bad-bg: #3a2126;
+    --c1: #6d97e8; --c2: #a887dc; --c3: #45b8c4; --c4: #dc8a52; --c5: #86b556; --c0: #4a4a45;
   }
-  :root[data-theme="light"] {
-    --surface: #fcfcfb; --panel: #ffffff; --panel-2: #f5f5f3;
-    --ink: #16161a; --ink-2: #4a4a52; --ink-3: #7b7b85;
-    --rule: #e2e2dd; --rule-2: #cfcfc8;
-    --good: #1a8a5e; --warn: #a8761f; --bad: #b83a4c; --track: #e7e7e2;
-  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--surface); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 64rem; margin: 0 auto; padding: 2.5rem 1rem 5rem; }
+  code, .p { font-family: var(--mono); font-size: .82em; background: var(--panel-2); border: 1px solid var(--rule); border-radius: 4px; padding: .02em .3em; word-break: break-word; }
+  .eyebrow { font-family: var(--mono); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 680; letter-spacing: -.02em; line-height: 1.15; }
+  h2 { font-size: 1.15rem; font-weight: 660; letter-spacing: -.01em; margin: 3rem 0 .25rem; display: flex; gap: .6rem; align-items: baseline; }
+  h2 .n { font-family: var(--mono); font-size: .75rem; color: var(--ink-3); font-weight: 500; }
+  .lede { color: var(--ink-3); font-size: .9rem; margin-bottom: 1.1rem; }
+  .panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 1.1rem 1.2rem; }
+  .txt-good { color: var(--good); } .txt-warn { color: var(--warn); } .txt-bad { color: var(--bad); }
+  .bg-good { background: var(--good); } .bg-warn { background: var(--warn); } .bg-bad { background: var(--bad); }
+  .chip { font-size: .75rem; padding: .15rem .5rem; border-radius: 99px; background: var(--panel-2); border: 1px solid var(--rule); color: var(--ink-2); white-space: nowrap; }
+  .legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: .75rem; color: var(--ink-3); margin-top: .9rem; }
 
-  body {
-    background: var(--surface);
-    color: var(--ink);
-    font-family: var(--sans);
-    font-size: 16px;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
-  .wrap { max-width: 60rem; margin: 0 auto; padding: 3rem 1.25rem 6rem; }
+  /* MASTHEAD */
+  .hero { display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: center; margin-top: 1.4rem; }
+  @media (max-width: 680px) { .hero { grid-template-columns: 1fr; } }
+  .gauge { width: 170px; height: 170px; }
+  .gauge text { font-family: var(--sans); fill: var(--ink); }
+  .tagline { font-size: 1.25rem; font-weight: 640; letter-spacing: -.01em; margin-bottom: .8rem; }
+  .yinyang { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  @media (max-width: 480px) { .yinyang { grid-template-columns: 1fr; } }
+  .yy { border-radius: 10px; padding: .75rem .9rem; font-size: .88rem; }
+  .yy b { display: block; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; font-family: var(--mono); margin-bottom: .35rem; }
+  .yy.good { background: var(--good-bg); } .yy.good b { color: var(--good); }
+  .yy.bad { background: var(--bad-bg); } .yy.bad b { color: var(--bad); }
+  .yy ul { list-style: none; } .yy li { margin: .12rem 0; }
+  .meta { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .9rem; }
 
-  header.masthead { border-bottom: 1px solid var(--rule); padding-bottom: 2rem; margin-bottom: 2.5rem; }
-  .eyebrow { font-family: var(--mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
-  h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.15; font-weight: 650; letter-spacing: -.02em; margin: .5rem 0 .6rem; }
-  .sub { color: var(--ink-2); max-width: 46rem; }
+  /* SCORECARD */
+  .bars { display: grid; gap: .45rem; }
+  .bar-row { display: grid; grid-template-columns: 1.6rem minmax(9rem, 15rem) 1fr 2.2rem 7.5rem; gap: .7rem; align-items: center; font-size: .88rem; }
+  @media (max-width: 680px) { .bar-row { grid-template-columns: 1.4rem 1fr 2rem; } .bar-row .track, .bar-row .kind { grid-column: 2 / -1; } }
+  .bar-row .i { font-family: var(--mono); color: var(--ink-3); font-size: .75rem; }
+  .track { height: 12px; background: var(--track); border-radius: 6px; position: relative; overflow: hidden; }
+  .track i { position: absolute; inset: 0 auto 0 0; border-radius: 6px; }
+  .bars .track::after { content: ""; position: absolute; left: 60%; top: 0; bottom: 0; border-left: 1px dashed var(--ink-3); opacity: .5; }
+  .sc { font-family: var(--mono); font-weight: 650; text-align: right; }
+  .kind { font-size: .7rem; font-family: var(--mono); padding: .12rem .45rem; border-radius: 5px; text-align: center; }
+  .kind.enf { background: var(--good-bg); color: var(--good); }
+  .kind.pro { background: var(--bad-bg); color: var(--bad); }
+  .divider { border-top: 1px dashed var(--rule-2); margin: .5rem 0; position: relative; }
+  .divider span { position: absolute; top: -.65rem; left: 50%; transform: translateX(-50%); background: var(--panel); padding: 0 .6rem; font-size: .72rem; color: var(--ink-3); font-family: var(--mono); }
+  a.plink { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--ink-3); }
+  a.plink:hover { color: var(--ink); border-bottom-style: solid; }
 
-  .hero { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-end; margin-top: 2rem; }
-  .hero-num { font-size: clamp(3rem, 9vw, 4.5rem); line-height: .9; font-weight: 700; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-  .hero-num span { font-size: .35em; font-weight: 500; color: var(--ink-3); letter-spacing: 0; }
-  .hero-meta { color: var(--ink-2); font-size: .92rem; padding-bottom: .3rem; }
-  .hero-meta strong { color: var(--ink); font-weight: 600; }
+  /* ISSUE BLOCK: principle strip + problem → solution + prompt */
+  .pair { display: grid; grid-template-columns: 1fr 2rem 1fr; gap: .7rem; background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 1rem 1.1rem 1.1rem; margin-bottom: 1rem; scroll-margin-top: 1rem; }
+  .pair:target { outline: 2px solid var(--warn); }
+  .pair.defer { border-style: dashed; }
+  @media (max-width: 760px) { .pair { grid-template-columns: 1fr; } .pair > .arrow { transform: rotate(90deg); } }
+  .pair-h { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .5rem; }
+  .pair-h h3 { font-size: 1rem; font-weight: 650; margin-right: auto; }
+  .fixtag { font-family: var(--mono); font-size: .72rem; font-weight: 700; background: var(--ink); color: var(--surface); border-radius: 6px; padding: .15rem .5rem; }
+  .arrow { align-self: center; justify-self: center; font-size: 1.4rem; color: var(--ink-3); }
+  .prob, .sol { border-radius: 10px; padding: .75rem .85rem; min-width: 0; display: flex; flex-direction: column; gap: .55rem; }
+  .prob { background: var(--bad-bg); } .sol { background: var(--good-bg); }
+  .lbl { font-family: var(--mono); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
+  .lbl code { text-transform: none; letter-spacing: 0; }
+  .prob .lbl { color: var(--bad); } .sol .lbl { color: var(--good); }
+  .pair .note { grid-column: 1 / -1; font-size: .78rem; color: var(--ink-3); }
+  .fg-title { font-weight: 640; font-size: .9rem; }
+  .kpis { display: flex; flex-wrap: wrap; gap: .3rem; font-size: .74rem; color: var(--ink-2); }
+  .kpis span { background: var(--panel); border-radius: 6px; padding: .15rem .45rem; }
 
-  h2 { font-size: 1.28rem; font-weight: 650; letter-spacing: -.01em; margin: 3.5rem 0 .4rem; }
-  h2:first-of-type { margin-top: 2.5rem; }
-  .section-note { color: var(--ink-3); font-size: .9rem; margin-bottom: 1.5rem; }
+  .pstrip { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(12rem, 1fr) 1.4fr; gap: .9rem; align-items: center; border: 1px solid var(--rule); border-left: 4px solid var(--band); border-radius: 10px; padding: .6rem .8rem; scroll-margin-top: 1rem; }
+  .pstrip.good { --band: var(--good); } .pstrip.warn { --band: var(--warn); } .pstrip.bad { --band: var(--bad); }
+  .pstrip:target { outline: 2px solid var(--warn); }
+  @media (max-width: 760px) { .pstrip { grid-template-columns: auto 1fr; } .pstrip .pm { grid-column: 1 / -1; } }
+  .pscore { font-family: var(--mono); font-weight: 700; font-size: 1.6rem; color: var(--band); line-height: 1; }
+  .pscore span { font-size: .75rem; color: var(--ink-3); font-weight: 500; }
+  .pname { font-weight: 650; font-size: .92rem; margin-bottom: .35rem; display: flex; align-items: baseline; gap: .45rem; flex-wrap: wrap; }
+  .pname small { font-family: var(--mono); font-size: .7rem; color: var(--ink-3); font-weight: 500; }
+  .pname em { font-style: normal; font-family: var(--mono); font-size: .66rem; text-transform: uppercase; letter-spacing: .08em; color: var(--band); }
+  .stat { display: flex; gap: .45rem; flex-wrap: wrap; }
+  .stat div { background: var(--panel-2); border-radius: 7px; padding: .3rem .55rem; font-size: .72rem; color: var(--ink-3); line-height: 1.2; }
+  .stat div b { display: block; font-size: 1rem; color: var(--ink); font-family: var(--mono); }
+  .pm { list-style: none; font-size: .82rem; color: var(--ink-2); }
+  .pm li { padding-left: 1.15rem; position: relative; margin: .18rem 0; line-height: 1.4; }
+  .pm li::before { position: absolute; left: 0; font-family: var(--mono); font-weight: 700; }
+  .pm li.y::before { content: "✓"; color: var(--good); }
+  .pm li.n::before { content: "✗"; color: var(--bad); }
 
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--rule);
-    border-radius: 10px;
-    padding: 1.15rem 1.25rem;
-    margin-bottom: .6rem;
-  }
-  .card-head { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: baseline; justify-content: space-between; }
-  .card-title { font-weight: 620; font-size: 1rem; }
-  .card-title .idx { font-family: var(--mono); color: var(--ink-3); font-size: .8rem; margin-right: .55rem; font-weight: 500; }
-  .score { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: .95rem; font-weight: 600; white-space: nowrap; }
-  .score .band { font-family: var(--sans); font-size: .74rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; margin-left: .55rem; }
+  /* VISUAL COMPONENTS (use inside .prob / .sol) */
+  .dots { display: flex; flex-wrap: wrap; gap: 3px; }
+  .dots i { width: 13px; height: 13px; border-radius: 3px; display: block; }
+  .dots.sm i { width: 7px; height: 7px; border-radius: 2px; }
+  .dots.big i { width: 18px; height: 18px; }
+  .keys { display: flex; flex-wrap: wrap; gap: .3rem .9rem; font-size: .76rem; color: var(--ink-2); }
+  .keys span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: .35rem; background: var(--k); }
+  .dboxes { display: flex; flex-wrap: wrap; gap: .45rem; }
+  .dbox { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: .45rem .55rem; flex: 1 1 8rem; min-width: 0; }
+  .dbox b { display: block; font-family: var(--mono); font-size: .72rem; margin-bottom: .35rem; }
+  .dbox.badbox { border-color: var(--bad); } .dbox.badbox b { color: var(--bad); }
+  .dbox.goodbox { border-color: var(--good); } .dbox.goodbox b { color: var(--good); }
+  .folders { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: .45rem; }
+  .fold { background: var(--panel); border: 1px solid var(--rule); border-radius: 9px; padding: .5rem .65rem; font-size: .74rem; color: var(--ink-3); border-left: 4px solid var(--fc, var(--c0)); }
+  .fold b { display: block; font-family: var(--mono); color: var(--ink); font-size: .82rem; margin-bottom: .15rem; }
+  .fold .sub { display: flex; flex-wrap: wrap; gap: .25rem; margin-top: .3rem; }
+  .fold .sub code { font-size: .68rem; }
+  .rules { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .rule { font-family: var(--mono); font-size: .72rem; padding: .22rem .5rem; border-radius: 6px; background: var(--panel); color: var(--good); border: 1px solid var(--good); }
+  .fan-row { display: grid; grid-template-columns: 7.5rem 1fr; gap: .6rem; align-items: center; font-size: .82rem; }
+  .pips { display: flex; gap: 3px; flex-wrap: wrap; align-items: center; }
+  .pips i { width: 16px; height: 12px; border-radius: 3px; background: var(--bad); opacity: .85; display: block; }
+  .pips em { font-style: normal; font-family: var(--mono); font-size: .76rem; color: var(--ink-3); margin-left: .4rem; }
+  .map-row { display: grid; grid-template-columns: 6rem 1fr 4.2rem; gap: .6rem; align-items: center; font-size: .82rem; }
+  .map-row .track { height: 14px; }
+  .map-row .pct { font-family: var(--mono); text-align: right; font-size: .78rem; }
+  .dirrow { display: flex; flex-wrap: wrap; gap: .3rem; }
+  code.bad { color: var(--bad); border-color: var(--bad); }
+  code.good { color: var(--good); border-color: var(--good); font-weight: 650; }
+  .scatter { display: grid; gap: .35rem; justify-items: start; position: relative; padding-left: 5.8rem; }
+  .scatter .hub { position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: var(--bad); color: #fff; font-size: .75rem; font-weight: 700; border-radius: 99px; padding: .25rem .6rem; }
+  .scatter code { position: relative; }
+  .scatter code::before { content: ""; position: absolute; right: 100%; top: 50%; width: 1.3rem; border-top: 2px dashed var(--bad); }
+  .flow { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; font-size: .8rem; }
+  .flow span { background: var(--panel); border: 1px solid var(--rule); border-radius: 7px; padding: .35rem .55rem; }
+  .flow span.dim { color: var(--ink-3); border-style: dashed; }
+  .flow span.bad { color: var(--bad); border-color: var(--bad); font-weight: 650; }
+  .flow span.good { color: var(--good); border-color: var(--good); font-weight: 650; }
+  .flow i { font-style: normal; color: var(--ink-3); }
+  .mirror { display: flex; flex-direction: column; align-items: flex-start; gap: .15rem; }
+  .mirror i { font-style: normal; color: var(--good); font-weight: 700; padding-left: .5rem; }
+  .checks { display: flex; flex-wrap: wrap; gap: .3rem; }
+  .checks span { font-family: var(--mono); font-size: .72rem; border-radius: 6px; padding: .25rem .5rem; border: 1px dashed var(--rule-2); color: var(--ink-3); background: var(--panel); text-decoration: line-through; }
+  .checks span.on { border: 1px solid var(--good); color: var(--good); font-weight: 650; text-decoration: none; }
+  .checks span.off { text-decoration: none; opacity: .55; }
+  .pipe { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+  .pipe .dbox { flex: 0 1 auto; }
+  .pipe > i { font-style: normal; font-weight: 700; color: var(--ink-3); font-size: .8rem; }
+  .pipe > i.bad { color: var(--bad); } .pipe > i.good { color: var(--good); }
+  .claim { display: flex; flex-direction: column; gap: .2rem; font-size: .82rem; }
+  .claim q { font-style: italic; color: var(--ink-2); }
+  .claim .bad { color: var(--bad); font-weight: 650; } .claim .good { color: var(--good); font-weight: 650; }
+  .closure .outer { background: var(--panel); border: 2px solid var(--warn); border-radius: 8px; padding: .5rem .6rem; font-size: .8rem; }
+  .closure .outer span { color: var(--ink-3); font-size: .72rem; }
+  .closure .inner { display: grid; grid-template-columns: repeat(4, 1fr); gap: .3rem; margin-top: .45rem; }
+  .closure .inner i { height: 1.4rem; border-radius: 5px; border: 1px dashed var(--good); background: var(--good-bg); }
+  svg.diagram { width: 100%; height: auto; display: block; }
+  svg.diagram text { font-family: var(--sans); fill: var(--ink); }
+  svg.diagram .box { fill: var(--panel); stroke: var(--rule-2); }
+  svg.diagram .mut { fill: var(--ink-3); }
+  svg.diagram .ok { stroke: var(--good); fill: none; stroke-width: 2; }
+  svg.diagram .no { stroke: var(--bad); fill: none; stroke-width: 2; stroke-dasharray: 5 4; }
 
-  .meter { height: 8px; background: var(--track); border-radius: 4px; margin: .75rem 0 .8rem; overflow: hidden; }
-  .meter i { display: block; height: 100%; border-radius: 4px; }
-  .fill-good { background: var(--good); } .txt-good { color: var(--good); }
-  .fill-warn { background: var(--warn); } .txt-warn { color: var(--warn); }
-  .fill-bad  { background: var(--bad); }  .txt-bad  { color: var(--bad); }
+  /* PROMPT */
+  details.prompt { grid-column: 1 / -1; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+  details.prompt summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: var(--panel-2); padding: .45rem .7rem; font-family: var(--mono); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+  details.prompt summary::-webkit-details-marker { display: none; }
+  details.prompt summary span::before { content: "▸ "; } details.prompt[open] summary span::before { content: "▾ "; }
+  details.prompt button { font: inherit; letter-spacing: normal; text-transform: none; font-size: .75rem; cursor: pointer; background: var(--ink); color: var(--surface); border: none; border-radius: 6px; padding: .25rem .7rem; }
+  details.prompt pre { font-family: var(--mono); font-size: .76rem; line-height: 1.55; white-space: pre-wrap; padding: .7rem .8rem; color: var(--ink-2); margin: 0; }
 
-  .verdict { color: var(--ink-2); font-size: .94rem; margin-bottom: .9rem; }
-  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-  @media (max-width: 640px) { .split { grid-template-columns: 1fr; gap: 1rem; } }
-  .split h4 { font-family: var(--mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: .4rem; font-weight: 600; }
-  .split ul { list-style: none; }
-  .split li { font-size: .89rem; color: var(--ink-2); padding-left: 1rem; position: relative; margin-bottom: .38rem; line-height: 1.5; }
-  .split li::before { position: absolute; left: 0; font-family: var(--mono); }
-  .keeps li::before { content: "+"; color: var(--good); }
-  .gaps li::before { content: "−"; color: var(--bad); }
+  /* FIX ORDER */
+  .road { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; }
+  @media (max-width: 860px) { .road { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .road { grid-template-columns: 1fr; } }
+  .lane { background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: .8rem; display: flex; flex-direction: column; gap: .5rem; }
+  .lane-h { font-family: var(--mono); font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); display: flex; justify-content: space-between; }
+  .lane-h b { color: var(--ink); }
+  a.task { display: block; color: inherit; text-decoration: none; border-radius: 9px; padding: .55rem .65rem; background: var(--panel-2); font-size: .82rem; line-height: 1.35; }
+  a.task:hover { outline: 2px solid var(--rule-2); }
+  .task .num { font-family: var(--mono); font-weight: 700; color: var(--ink-3); margin-right: .3rem; }
+  .task .eff { display: inline-block; font-family: var(--mono); font-size: .68rem; color: var(--ink-3); margin-top: .3rem; }
+  .task .pr { font-family: var(--mono); font-size: .68rem; color: var(--ink-3); float: right; margin-top: .3rem; }
+  a.task.hot { outline: 2px solid var(--warn); }
+  a.task.defer { opacity: .7; border: 1px dashed var(--rule-2); background: transparent; }
+  .warnbox { margin-top: .8rem; background: var(--warn-bg); border-radius: 10px; padding: .7rem .9rem; font-size: .85rem; }
+  .warnbox b { color: var(--warn); }
 
-  code, .path {
-    font-family: var(--mono); font-size: .84em;
-    background: var(--panel-2); border: 1px solid var(--rule);
-    border-radius: 4px; padding: .05em .35em; color: var(--ink);
-    word-break: break-word;
-  }
+  /* WHOLE-REPO TREE */
+  .treepair { display: grid; grid-template-columns: 1fr 2rem 1fr; gap: .7rem; align-items: start; }
+  @media (max-width: 760px) { .treepair { grid-template-columns: 1fr; } .treepair > .arrow { transform: rotate(90deg); } }
+  .treecol { border-radius: 12px; padding: .8rem .9rem; min-width: 0; }
+  .treecol.before { background: var(--bad-bg); } .treecol.after { background: var(--good-bg); }
+  .treecol .lbl { margin-bottom: .5rem; }
+  .treecol.before .lbl { color: var(--bad); } .treecol.after .lbl { color: var(--good); }
+  .ftree, .ftree ul { list-style: none; }
+  .ftree { background: var(--panel); border-radius: 8px; padding: .6rem .7rem; font-family: var(--mono); font-size: .76rem; line-height: 1.45; }
+  .ftree ul { margin-left: .45rem; padding-left: .8rem; border-left: 1px solid var(--rule-2); }
+  .ftree li { margin: .2rem 0; position: relative; }
+  .ftree ul > li::before { content: ""; position: absolute; left: -.8rem; top: .7em; width: .6rem; border-top: 1px solid var(--rule-2); }
+  .ftree b { font-weight: 600; color: var(--ink-3); font-size: .7rem; background: var(--panel-2); border-radius: 4px; padding: 0 .3rem; }
+  .ftree em { font-style: normal; font-family: var(--sans); font-size: .72rem; color: var(--ink-3); margin-left: .25rem; }
+  .ftree li.bad { color: var(--bad); font-weight: 600; }
+  .ftree li.new { color: var(--good); font-weight: 600; }
+  .ftree li.good { color: var(--good); }
+  .ftree li.dim { color: var(--ink-3); }
+  .ftree li.bad > ul, .ftree li.new > ul, .ftree li.good > ul { font-weight: 400; color: var(--ink); }
+  .ftree .fx { font-size: .64rem; font-weight: 700; text-decoration: none; color: var(--surface); background: var(--ink); border-radius: 4px; padding: 0 .3rem; margin-left: .35rem; vertical-align: 1px; }
+  .treekpis { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .8rem; }
+  .treekpis div { background: var(--panel); border: 1px solid var(--rule); border-radius: 9px; padding: .45rem .7rem; font-size: .75rem; color: var(--ink-3); line-height: 1.25; }
+  .treekpis b { display: block; font-family: var(--mono); font-size: 1rem; color: var(--ink); }
 
-  .scroller { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); }
-  table { border-collapse: collapse; width: 100%; min-width: 34rem; font-size: .9rem; }
-  th, td { text-align: left; padding: .7rem .9rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
-  thead th { font-family: var(--mono); font-size: .68rem; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; background: var(--panel-2); white-space: nowrap; }
-  tbody tr:last-child td { border-bottom: none; }
-  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
-
-  .pill { display: inline-block; font-size: .7rem; font-weight: 650; letter-spacing: .05em; text-transform: uppercase; padding: .12rem .45rem; border-radius: 4px; border: 1px solid currentColor; white-space: nowrap; }
-
-  blockquote { border-left: 2px solid var(--rule-2); padding: .1rem 0 .1rem 1rem; color: var(--ink-2); font-size: .92rem; margin: 1rem 0; }
-  blockquote .src { display: block; font-family: var(--mono); font-size: .74rem; color: var(--ink-3); margin-top: .4rem; }
-
-  footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); color: var(--ink-3); font-size: .84rem; }
-  footer p { margin-bottom: .5rem; }
-  ol.method { padding-left: 1.2rem; }
-  ol.method li { margin-bottom: .3rem; }
+  footer { margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--rule); color: var(--ink-3); font-size: .78rem; }
+  footer summary { cursor: pointer; color: var(--ink-2); }
+  footer ul { margin: .6rem 0 0 1.1rem; }
 </style>
 
 <div class="wrap">
 
-<header class="masthead">
-  <div class="eyebrow">Structural audit · {{DATE}}</div>
-  <h1>{{REPO_NAME}} — {{MODE_HEADING}}</h1>
-  <p class="sub">
-    <span class="path">{{REPO_PATH}}</span> {{MODE_SUBTITLE}} — not code quality,
-    correctness, or product maturity.
-    <!-- Overengineering mode: add repo kind, age, and history confidence here. -->
-  </p>
+<!-- ================= 1. MASTHEAD ================= -->
+<div class="eyebrow">{{MODE_TITLE}} · {{DATE}} · <span class="p">{{REPO_PATH}}</span></div>
+<h1>{{REPO_NAME}}: {{short verdict, e.g. "well-guarded, hard to navigate"}}</h1>
 
-  <div class="hero">
-    <div class="hero-num txt-{{GOOD|WARN|BAD}}">{{TOTAL}}<span>/100</span></div>
-    <div class="hero-meta">
-      <!-- Two lines: overall characterization, then where the deficit concentrates. -->
-      <strong>{{ONE-PHRASE VERDICT}}</strong>, {{what it is unusually strong at}}.<br>
-      {{Where the deficit sits — a tier, a theme, or a single practice.}}
+<div class="hero">
+  <svg class="gauge" viewBox="0 0 170 170" role="img" aria-label="Score {{TOTAL}} out of 100">
+    <circle cx="85" cy="85" r="70" fill="none" stroke="var(--track)" stroke-width="14"/>
+    <circle cx="85" cy="85" r="70" fill="none" stroke="var(--{{good|warn|bad}})" stroke-width="14" stroke-linecap="round"
+      stroke-dasharray="{{TOTAL*4.398}} 439.8" transform="rotate(-90 85 85)"/>
+    <text x="85" y="92" text-anchor="middle" font-size="46" font-weight="700">{{TOTAL}}</text>
+    <text x="85" y="116" text-anchor="middle" font-size="13" style="fill:var(--ink-3)">/ 100 · {{band word}}</text>
+  </svg>
+  <div>
+    <!-- One sentence naming the single pattern behind the scores (the mode's
+         load-bearing idea). -->
+    <div class="tagline">{{e.g. Lots invested in <span class="txt-good">guarding</span> code. Little in <span class="txt-bad">arranging</span> it.}}</div>
+    <div class="yinyang">
+      <div class="yy good"><b>{{MODE_SPLIT_GOOD}} · scores {{a–b}}</b><ul>
+        <li>{{3–4 items, ≤ 6 words each}}</li></ul></div>
+      <div class="yy bad"><b>{{MODE_SPLIT_BAD}} · scores {{a–b}}</b><ul>
+        <li>{{3–4 items, ≤ 6 words each}}</li></ul></div>
+    </div>
+    <div class="meta">
+      <span class="chip">{{~N source files}}</span><span class="chip">{{N test files}}</span><span class="chip">{{N commits since …}}</span><span class="chip">{{stacks}}</span>
+      <!-- Overengineering mode: add chips for repo kind, age, and history confidence. -->
     </div>
   </div>
-</header>
-
-<h2>{{Scorecard | Proportionality scorecard}}</h2>
-<p class="section-note">Ten principles, 0–10 each. Bands: {{MODE_BANDS}}.</p>
-
-<div class="scroller" style="margin-bottom:2rem">
-<table>
-  <thead>
-    <tr><th>#</th><th>Principle</th><th>Score</th><th>Band</th><th>One-line verdict</th></tr>
-  </thead>
-  <tbody>
-    <!-- Order rows by score descending, so the reader sees strengths first.
-         Keep the # column as the principle's canonical number. -->
-    <tr>
-      <td class="num">7</td>
-      <td>Generated / external separated</td>
-      <td class="num txt-good">9</td>
-      <td><span class="pill txt-good">Strong</span></td>
-      <td>Gitignored, header-marked, lint-excluded, and drift-gated. Near-ideal</td>
-    </tr>
-    <!-- ... one row per principle.
-
-         READINESS: 1 Organize around behavior · 2 Explicit, enforced dependencies ·
-         3 Names own concepts · 4 One canonical workflow · 5 Instructions close to code ·
-         6 Tests mirror behavior · 7 Generated/external separated · 8 One live
-         implementation · 9 Consistency · 10 Right-sized files
-
-         OVERENGINEERING: 1 Abstractions have 2+ occupants · 2 Indirection carries logic ·
-         3 Configuration is configured · 4 Generality has a second caller ·
-         5 Infrastructure matches load · 6 Change is local · 7 Data models transform ·
-         8 Ceremony pays for itself · 9 Seams on the real axis · 10 Surface is reachable -->
-  </tbody>
-</table>
 </div>
 
-<h2>Findings by principle</h2>
-<p class="section-note">Evidence gathered by direct inspection of the working tree.</p>
-
-<!-- ===== One card per principle, in canonical 1-10 order ===== -->
-<div class="card">
-  <div class="card-head">
-    <div class="card-title"><span class="idx">01</span>{{PRINCIPLE NAME}}</div>
-    <div class="score txt-warn">{{N}}<span style="color:var(--ink-3)">/10</span><span class="band">Adequate</span></div>
+<!-- ================= 2. SCORECARD ================= -->
+<h2><span class="n">01</span>{{Scorecard | Proportionality scorecard}}</h2>
+<p class="lede">Each principle scored 0–10. The dashed line marks 6. {{MODE_TAG_NOTE}} Click a name to jump to its issue.</p>
+<div class="panel">
+  <div class="bars">
+    <!-- One row per principle, sorted by score descending. Link each name to its
+         .pstrip id (#p1 … #p10). kind.enf = green tag, kind.pro = red tag.
+         Put the .divider where the split in the masthead falls. -->
+    <div class="bar-row"><span class="i">07</span><a class="plink" href="#p7">{{Principle name}}</a><div class="track"><i class="bg-good" style="width:80%"></i></div><span class="sc txt-good">8</span><span class="kind enf">{{what enforces it}}</span></div>
+    <div class="divider"><span>{{MODE_SPLIT_GOOD}} ▲ · ▼ {{MODE_SPLIT_BAD}}</span></div>
+    <div class="bar-row"><span class="i">01</span><a class="plink" href="#p1">{{Principle name}}</a><div class="track"><i class="bg-bad" style="width:40%"></i></div><span class="sc txt-bad">4</span><span class="kind pro">{{e.g. convention}}</span></div>
   </div>
-  <div class="meter"><i class="fill-warn" style="width:{{N*10}}%"></i></div>
-  <p class="verdict">
-    {{Two or three sentences. State the shape of the result and why it landed at this
-    score. Name the divergence if tiers differ sharply.}}
-  </p>
-  <div class="split">
-    <div class="keeps"><h4>Working</h4><ul>
-      <li>{{Evidence with a <span class="path">path</span>, a count, or a quoted rule}}</li>
-    </ul></div>
-    <div class="gaps"><h4>Costing {{searches | verification | the feedback loop | correctness | context | predictability | retrieval | pattern-matching | every read | every new field | every new feature}}</h4><ul>
-      <li>{{Evidence. <strong>Bold the claim</strong>, then the number or path that proves it}}</li>
-      <!-- Overengineering mode: state the failed falsification test here — e.g.
-           "one implementation, no second in the tree, none in issues or TODOs". -->
-    </ul></div>
+  <div class="legend"><span><b class="txt-good">■</b> {{MODE_BANDS_GOOD}}</span><span><b class="txt-warn">■</b> {{MODE_BANDS_WARN}}</span><span><b class="txt-bad">■</b> {{MODE_BANDS_BAD}}</span></div>
+</div>
+
+<!-- ================= 3. ISSUE SECTIONS =================
+     Group the issues into 2–4 themed sections (e.g. "Flat folders → folders by behavior",
+     "Dependency direction", "Tests", "Workflow and hygiene"). Each issue is one .pair.
+
+     A .pair holds, in order:
+       .pair-h      title · fix number · effort · principles the fix improves
+       .pstrip      the HOME of one principle (0, 1, or 2 per pair). Every principle
+                    has exactly one home in the whole report; never repeat a strip.
+                    The ✗ lines list only costs the visual below does NOT already show.
+       .prob → .arrow → .sol
+                    The same visual on both sides, changed: squares regrouped into
+                    folders, red arrows turned green, check tiles lit. Pick components
+                    from the catalog at the bottom of this file.
+       details.prompt
+                    A self-contained prompt that fixes only this issue.
+
+     A strong principle with nothing to fix still gets a home: use fixtag
+     "No fix needed", the problem side titled "Watch", and no prompt.
+     A pair whose fix lives in another block (e.g. dependency rules added by the
+     restructure) uses fixtag "Comes with fix #N", no prompt, and a .note. -->
+
+<h2><span class="n">02</span>{{Theme: problem → direction}}</h2>
+<p class="lede">{{One line on how to read the visuals in this section.}}</p>
+
+<!-- EXAMPLE — a flat folder regrouped by behavior -->
+<div class="pair" id="pair-{{slug}}">
+  <div class="pair-h"><h3>{{Area name, e.g. monitor/ core}}</h3><span class="fixtag">Fix #{{N}}</span><span class="chip">{{~2h | ~1d | weeks}}</span><span class="chip">{{P1 P2}}</span></div>
+  <div class="pstrip bad" id="p1">
+    <div class="pscore">4<span>/10</span></div>
+    <div class="pbody"><div class="pname"><small>P1</small>{{Principle name}}<em>{{band word}}</em></div>
+      <div class="stat"><div><b>95</b>{{flat files}}</div><div><b>13</b>{{dirs per feature}}</div></div></div>
+    <ul class="pm"><li class="y">{{what works, ≤ 12 words}}</li><li class="n">{{cost not shown below, ≤ 12 words}}</li></ul>
   </div>
-
-  <!-- Optional, and high-impact: use when the repo documents its own problem. -->
-  <blockquote>
-    "{{quoted comment from the repo}}"
-    <span class="src">{{file path}} — {{what the quote demonstrates}}</span>
-  </blockquote>
+  <div class="prob">
+    <div class="lbl">Problem</div>
+    <div class="fg-title">{{95 files · 1 subfolder}}</div>
+    <div class="dots" data-g="30:c1,9:c2,5:c3,51:c0"></div>
+    <div class="keys"><span style="--k:var(--c1)">{{session-* 30}}</span><span style="--k:var(--c2)">{{pipeline-* 9}}</span><span style="--k:var(--c3)">{{observation-* 5}}</span><span style="--k:var(--c0)">{{other 51}}</span></div>
+    <div class="kpis"><span><b>{{11}}</b> {{short fact}}</span></div>
+  </div>
+  <div class="arrow">→</div>
+  <div class="sol">
+    <div class="lbl">Solution</div>
+    <div class="folders">
+      <div class="fold" style="--fc:var(--c1)"><b>{{sessions/}}</b><div class="sub"><code>{{catalog}}</code><code>{{history}}</code></div></div>
+      <div class="fold" style="--fc:var(--c2)"><b>{{diagnostics/}}</b>{{what lives here}}</div>
+    </div>
+    <div class="rules"><span class="rule">{{providers/** → normalize/** only}}</span></div>
+  </div>
+  <details class="prompt"><summary><span>Prompt · fix #{{N}} only</span><button type="button">Copy</button></summary><pre>{{Self-contained prompt. See SKILL.md, "Fix prompts".}}</pre></details>
 </div>
 
-<h2>What to fix, in order</h2>
-<p class="section-note">Ordered by payoff per hour, not by score. {{Effort framing, e.g. "Every item is days of work, not months."}}</p>
-
-<div class="scroller">
-<table>
-  <thead>
-    <tr><th>#</th><th>Action</th><th>Principle</th><th>Effort</th><th>Why here</th></tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td class="num">1</td>
-      <td><strong>{{Action, imperative}}</strong></td>
-      <td class="num">{{principle number(s)}}</td>
-      <td class="num">{{~2h | ~1d | weeks}}</td>
-      <td>{{Why it earns this rank — leverage, not severity}}</td>
-    </tr>
-    <!-- Last row is usually the one real project. Say plainly that a half-finished
-         version is worse than not starting. -->
-  </tbody>
-</table>
+<!-- ================= 4. FIX ORDER ================= -->
+<h2><span class="n">{{NN}}</span>Fix order</h2>
+<p class="lede">Ordered by payoff per hour, not by score. Click a task to jump to its problem and solution.</p>
+<div class="road">
+  <div class="lane">
+    <div class="lane-h"><b>Quick wins</b><span>{{&lt; 1 day total}}</span></div>
+    <a class="task hot" href="#pair-{{slug}}"><span class="num">1</span>{{Action, ≤ 8 words}}<br><span class="eff">{{~2h}}</span><span class="pr">{{P4 P6}}</span></a>
+  </div>
+  <div class="lane"><div class="lane-h"><b>Cleanups</b><span>{{~3 days}}</span></div></div>
+  <div class="lane"><div class="lane-h"><b>Restructure</b><span>{{~2–3 days}}</span></div></div>
+  <div class="lane"><div class="lane-h"><b>Defer</b><span>weeks</span></div>
+    <!-- <a class="task defer" …> for anything measured in weeks -->
+  </div>
 </div>
+<div class="warnbox"><b>All or nothing:</b> {{a half-finished version of the biggest restructure is worse than not starting. Say which fix, and why.}}</div>
 
 <!-- ===== OVERENGINEERING MODE ONLY — required, do not omit =====
-     The counterweight. Without it the report reads as an argument for minimalism,
-     which is a different and equally wrong position. If the sweeps found no
-     under-engineering, keep the section and say so explicitly.
-<h2>Where the repo is under-engineered</h2>
-<p class="section-note">The counterweight: duplication and missing seams found by the same sweeps. Proportionality cuts both ways.</p>
-<div class="card">
-  <p class="verdict">{{What was found, or an explicit "the sweeps found none".}}</p>
-  <ul>
-    <li>{{Evidence with a <span class="path">path</span> and a count}}</li>
-  </ul>
+     The counterweight, as one more .pair in the issue sections (before Fix order):
+     fixtag "Counterweight", problem = the duplication or missing seam drawn as squares
+     (e.g. data-g="11:bad" for a helper copied 11 times), solution = one home. If the
+     sweeps found no under-engineering, keep the block and say so in .prob.
+     Without it the report reads as an argument for minimalism. -->
+
+<!-- ================= 5. WHOLE REPO ================= -->
+<h2><span class="n">{{NN}}</span>Whole repo: today → after all fixes</h2>
+<p class="lede">Tracked files from <code>git ls-files</code>. Numbers are file counts. The badge shows which fix changes that line. Unchanged folders are left out.</p>
+<div class="treepair">
+  <div class="treecol before">
+    <div class="lbl">Today</div>
+    <!-- Folders only, never individual files (except key root files like AGENTS.md).
+         li.d = folder, li.f = file or file group. li.bad = a problem today.
+         Aim for 20–35 lines. -->
+    <ul class="ftree">
+      <li class="d">{{repo}}/
+        <ul>
+          <li class="f bad">{{AGENTS.md}} <em>{{what's wrong}}</em><a class="fx" href="#pair-{{slug}}">#{{N}}</a></li>
+          <li class="d">{{monitor/}} <b>{{174}}</b>
+            <ul><li class="f bad">{{95 flat files}}<a class="fx" href="#pair-{{slug}}">#{{N}}</a></li></ul></li>
+        </ul></li>
+    </ul>
+  </div>
+  <div class="arrow">→</div>
+  <div class="treecol after">
+    <div class="lbl">After fixes 1–{{N}}</div>
+    <!-- Same order as "Today" so the eye can compare row by row.
+         li.new = new or moved, li.good = unchanged and already right,
+         li.dim = later or optional. Mark estimates with "~". -->
+    <ul class="ftree">
+      <li class="d">{{repo}}/
+        <ul>
+          <li class="f new">{{AGENTS.md}} <em>{{what changed}}</em><a class="fx" href="#pair-{{slug}}">#{{N}}</a></li>
+          <li class="d">{{monitor/}}
+            <ul><li class="d new">{{runtime/ · normalize/ · serving/}}<a class="fx" href="#pair-{{slug}}">#{{N}}</a></li></ul></li>
+        </ul></li>
+    </ul>
+  </div>
 </div>
-===== END OVERENGINEERING-ONLY SECTION ===== -->
+<div class="treekpis">
+  <div><b>{{95 → 3}}</b>{{loose files in monitor/}}</div>
+</div>
+<div class="legend"><span><b class="txt-bad">■</b> problem today</span><span><b class="txt-good">■</b> new or moved</span><span><b style="color:var(--ink-3)">■</b> unchanged or later</span></div>
 
-<h2>Reading the result</h2>
-<p style="color:var(--ink-2); max-width:46rem">
-  {{The single pattern that explains the score spread. Most often: every principle scored
-  strong is one encoded into a check; every principle scored weak is one only written
-  down. Name the specific artifacts on each side.}}
-</p>
-<p style="color:var(--ink-2); max-width:46rem; margin-top:1rem">
-  {{What that implies for effort — usually that the cheap fixes remove most of the
-  friction, and only the last item is a genuine project.}}
-</p>
-
+<!-- ================= 6. FOOTER ================= -->
 <footer>
-  <p><strong>Method</strong></p>
-  <ol class="method">
-    <li>Direct inspection of the working tree at <span class="path">{{REPO_PATH}}</span> on {{DATE}} — {{MODE_METHOD}}.</li>
-    <li>Ten principles {{MODE_RUBRIC_LINE}}; the headline is their unweighted sum.</li>
-    <li>Excluded from all counts: {{node_modules/, bin/, obj/, dist/, vendor/}}, and generated output.</li>
-    <li><strong>Not assessed:</strong> code correctness, test quality or coverage depth, runtime behavior, security, performance, or product fit. This audit {{MODE_NOT_ASSESSED}}. A codebase can score 100 here and still be wrong.</li>
-  </ol>
+  <details>
+    <summary>Method and scope</summary>
+    <ul>
+      <li>Read-only inspection of <span class="p">{{REPO_PATH}}</span> on {{DATE}}: {{MODE_METHOD}}. {{Solo, or: N parallel evidence subagents; the orchestrator re-checked key claims.}}</li>
+      <li>Ten principles {{MODE_RUBRIC_LINE}}; the headline is their unweighted sum.</li>
+      <li>Excluded from all counts: {{node_modules/, dist/, …}} and generated output.</li>
+      <li><strong>Not assessed:</strong> code correctness, test quality or coverage depth, runtime behavior, security, performance, or product fit. This audit {{MODE_NOT_ASSESSED}}. A codebase can score 100 here and still be wrong.</li>
+    </ul>
+  </details>
 </footer>
-
 </div>
+
+<!-- =====================================================================
+     COMPONENT CATALOG — copy into .prob / .sol. Use the SAME component on both
+     sides of a pair so the change is visible at a glance.
+
+     Squares, one per file (a flat folder, a list of copies, a test list):
+       <div class="dots" data-g="30:c1,9:c2,56:c0"></div>        grouped by color
+       <div class="dots" data-g="32:c1,23:c4" data-mix="1"></div>  interleaved (mixed folder)
+       sizes: .dots.sm (100+ items) · .dots.big (under 15)
+       colors: c1–c5 categories, c0 "other", good / bad / warn for status.
+       Always follow with <div class="keys"> naming each color with its count.
+
+     Squares regrouped into boxes (the solution for a flat folder):
+       <div class="dboxes"><div class="dbox"><b>claude/</b><div class="dots" data-g="31:c2"></div></div>…</div>
+       .dbox.badbox / .dbox.goodbox for "never run", "keep out", "all covered".
+
+     Target folders with no reliable per-folder counts (don't invent counts):
+       <div class="folders"><div class="fold" style="--fc:var(--c1)"><b>sessions/</b>…</div></div>
+
+     One feature spread across N directories:
+       <div class="fan-row"><span>Usage limits</span><div class="pips" data-n="13"></div></div>
+
+     Ratios (tests mapped, files near a cap):
+       <div class="map-row"><span>app</span><div class="track"><i class="bg-bad" style="width:6%"></i></div><span class="pct">10/156</span></div>
+
+     A process that fails late → fails early:
+       <div class="flow"><span>agent edits</span><i>→</i><span class="dim">nothing runs</span><i>→</i><span class="bad">CI fails</span></div>
+
+     Which checks a command runs (off = struck through, .on = lit):
+       <div class="checks"><span class="on">tests</span><span>lint</span><span>boundaries</span></div>
+
+     Source → build → output, or who imports what:
+       <div class="pipe"><div class="dbox"><b>src/</b></div><i class="good">→</i><div class="dbox"><b>out/</b></div></div>
+
+     A doc claim contradicted by code:
+       <div class="claim"><q>…no trace mode remains</q><span class="bad">✗ 7 files still carry it</span></div>
+
+     One concept living in several places:
+       <div class="scatter"><div class="hub">sessions</div><code>app/sessions/</code><code>components/dashboard/</code></div>
+
+     Same-job directories (red today, green after):
+       <div class="dirrow"><code class="bad">worker/</code><code class="bad">web/</code></div>
+
+     Test path derivable from source path:
+       <div class="mirror"><code>src/a/b.ts</code><i>⇅</i><code class="good">tests/a/b.test.ts</code></div>
+
+     One huge function split by responsibility:
+       <div class="closure"><div class="outer"><b>createHandler</b> <span>~668 of 700 lines</span><div class="inner"><i></i><i></i><i></i></div></div></div>
+
+     Dependency direction: an inline <svg class="diagram" viewBox="0 0 440 300"> per side.
+       Boxes: <rect class="box">. Allowed/checked edge: <path class="ok" marker-end="url(#ag)">.
+       Unchecked edge: <path class="no" marker-end="url(#ar)">. Blocked edge: a red ✗.
+       Define markers once per SVG (ids must be unique across the page). Label every
+       arrow with its count ("59 imports → 25 files"); font-size ≥ 10.
+     ===================================================================== -->
+
+<script>
+  document.querySelectorAll('.dots[data-g]').forEach(el => {
+    const groups = el.dataset.g.split(',').map(g => { const [n, c] = g.split(':'); return { n: +n, c }; });
+    const seq = [];
+    if (el.dataset.mix) {
+      const total = groups.reduce((a, g) => a + g.n, 0), used = groups.map(() => 0);
+      for (let k = 0; k < total; k++) {
+        let best = 0, bestGap = -Infinity;
+        groups.forEach((g, j) => { const gap = g.n * (k + 1) / total - used[j]; if (used[j] < g.n && gap > bestGap) { bestGap = gap; best = j; } });
+        used[best]++; seq.push(groups[best].c);
+      }
+    } else groups.forEach(g => { for (let k = 0; k < g.n; k++) seq.push(g.c); });
+    seq.forEach(c => { const i = document.createElement('i'); i.style.background = `var(--${c})`; el.appendChild(i); });
+  });
+  document.querySelectorAll('.pips').forEach(p => {
+    const n = +p.dataset.n;
+    for (let k = 0; k < n; k++) p.appendChild(document.createElement('i'));
+    const em = document.createElement('em'); em.textContent = n + ' dirs'; p.appendChild(em);
+  });
+  document.querySelectorAll('details.prompt').forEach(box => {
+    const btn = box.querySelector('button'), pre = box.querySelector('pre');
+    btn.addEventListener('click', async e => {
+      e.preventDefault(); e.stopPropagation();
+      const text = pre.textContent;
+      try { await navigator.clipboard.writeText(text); }
+      catch { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+      btn.textContent = 'Copied'; setTimeout(() => btn.textContent = 'Copy', 1500);
+    });
+  });
+</script>
