@@ -114,6 +114,69 @@ The report's status palette was validated for colorblind separation and contrast
 light and dark modes. Color is never the sole encoding — every score carries its number
 and a text band word, and every colored group is labeled with a name and count. If you change the hex values, re-validate.
 
+### `paper-cut-video`
+
+Turns a script, story, or bare topic into a 15–60 s animated video in a cut-paper
+storybook collage style: torn-paper shapes, a recurring hero character with a face,
+handwritten keywords that write themselves on, taped fact notes, and a synthesized
+soundtrack timed to the action. Everything is code — shapes drawn on a `<canvas>`,
+frames rendered headlessly, audio synthesized from a cue list — so there are no stock
+assets and nothing to license.
+
+**Usage:**
+
+```
+/paper-cut-video how volcanoes work
+/paper-cut-video path/to/script.txt 9:16, dreamy, storyboard first
+```
+
+Options, in words or flags: format (`1:1` default, `9:16`, `16:9`), length (~30 s
+default), language (the script's), fact notes on/off, mood (`cute`, `dreamy`, `none`),
+bpm, key, and "storyboard first" to review the plan before rendering.
+
+**Output** in `videos/<slug>/`: `<slug>.mp4` (H.264 + AAC), `<slug>.html` (self-contained
+interactive player), `cards.js` (the editable source), `soundtrack.mp3`.
+
+**Requirements.** Unlike the audit skill, this one runs code, so the machine needs:
+
+| Tool | Version | Install |
+|---|---|---|
+| Node.js | 18+ | nodejs.org · `brew install node` · `winget install OpenJS.NodeJS.LTS` |
+| Python | 3.8+ | python.org · `brew install python` · `winget install Python.Python.3.12` |
+| ffmpeg | any recent | `brew install ffmpeg` · `apt install ffmpeg` · `winget install ffmpeg` |
+| bash | — | built in on macOS/Linux; **Git Bash or WSL on Windows** |
+
+Everything else — Playwright, headless Chromium (~150 MB), numpy/scipy, the Patrick Hand
+font — is fetched by a one-time setup that the agent runs on first use. To do it by hand:
+
+```bash
+bash ~/.claude/skills/paper-cut-video/scripts/setup.sh
+```
+
+It needs internet access once and is safe to re-run. Downloads land in `scripts/` and are
+git-ignored. To check the install without an agent, render the bundled example:
+
+```bash
+cd ~/.claude/skills/paper-cut-video/scripts
+bash make_video.sh examples/example.js /tmp/demo --title Demo   # → /tmp/demo/demo.mp4
+```
+
+**Layout:**
+
+```
+paper-cut-video/
+  SKILL.md                 procedure: storyboard → cards.js → stills check → render → hand over
+  scripts/
+    setup.sh               one-time dependency install
+    stills.sh              cards.js → PNG stills + contact sheet, for a quick visual check
+    make_video.sh          cards.js → final MP4 + HTML player, in one command
+    build_page.py          assembles the self-contained HTML page
+    render.mjs             headless Chromium → frames → silent MP4 + sound cue list
+    soundtrack.py          synthesizes the soundtrack from the cue list
+    engine.js              the canvas engine and its drawing helpers
+    examples/example.js    reference cards.js
+```
+
 ## Install
 
 The skill body is plain Markdown and works with any agent that can be pointed at it.
@@ -149,8 +212,9 @@ Thereafter:
 cd ~/.claude/skills && git pull
 ```
 
-For a single project instead, copy `agent-readiness-audit/` into `.claude/skills/` at that
-repo's root.
+For a single project instead, copy the skill's folder (`agent-readiness-audit/` or
+`paper-cut-video/`, whole, including `scripts/`) into `.claude/skills/` at that repo's
+root.
 
 **Codex** — Codex has no skills directory. Either reference the procedure from your
 `AGENTS.md`:

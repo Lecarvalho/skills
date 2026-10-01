@@ -6,3 +6,6 @@ trello-cli/
 # Claude Code state that may appear in the skills directory
 .DS_Store
 Thumbs.db
+
+# Output of test renders made with paper-cut-video from this repo
+videos/

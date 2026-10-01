@@ -1,0 +1,4 @@
+node_modules/
+fonts/
+package-lock.json
+__pycache__/
