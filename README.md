@@ -242,9 +242,9 @@ Thereafter:
 cd ~/.claude/skills && git pull
 ```
 
-For a single project instead, copy the skill's folder (`agent-readiness-audit/` or
-`paper-cut-video/`, whole, including `scripts/`) into `.claude/skills/` at that repo's
-root.
+For a single project instead, copy the skill's folder (`agent-readiness-audit/`,
+`paper-cut-video/` or `stack/`, whole, with every file in it) into `.claude/skills/` at
+that repo's root.
 
 **Codex** — Codex has no skills directory. Either reference the procedure from your
 `AGENTS.md`:
