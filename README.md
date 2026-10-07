@@ -177,6 +177,36 @@ paper-cut-video/
     examples/example.js    reference cards.js
 ```
 
+### `stack`
+
+Queues work for one repository and lets it run on its own, one task at a time. Each task
+gets a fresh session in its own terminal window, so no session carries another task's
+context. When a session reaches its definition of done (an open pull request), it opens
+the next one, until the pile is empty. Nothing polls and no session sits open waiting.
+
+**Usage:**
+
+```
+/stack fix the export panel: the progress bar never reaches 100%
+/stack go        start the pile from a session with no work of its own
+/stack status    print the pile
+/stack clear     empty it
+```
+
+The pile is one hand-editable Markdown file inside the repository's git directory
+(`.git/session-stack/stack.md`), so it is never committed and needs no ignore rule. A
+task can name the model and effort its session starts with.
+
+The terminal launcher is Windows-only for now (Git Bash plus `cmd`).
+
+**Layout:**
+
+```
+stack/
+  SKILL.md    the procedure, and the only description of the behavior: read it there
+  stack.sh    the pile: add a task, hand off to the next session, show, status
+```
+
 ## Install
 
 The skill body is plain Markdown and works with any agent that can be pointed at it.
