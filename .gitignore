@@ -2,6 +2,8 @@
 # Claude Code's own state live alongside the tracked ones. Keep them untracked.
 
 trello-cli/
+impeccable/
+synced/
 
 # Claude Code state that may appear in the skills directory
 .DS_Store
