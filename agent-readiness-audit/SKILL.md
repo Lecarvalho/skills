@@ -199,12 +199,15 @@ counts, and colors in a few seconds, then read at most a line or two. Copy
 `assets/report-template.html`, follow its comments, and build every visual from the
 component catalog at the bottom of that file. Structure, in order:
 
-1. **Masthead** — a score gauge, a one-line headline verdict, one sentence naming the
-   single pattern behind the scores, and a two-box split: what scores high and why
-   (green) next to what scores low and why (red), 3–4 short items each. Chips for size,
-   commits, and stacks. In overengineering mode, add chips for repo kind, age, and
-   history confidence. This split is where the report names the pattern behind the scores.
-2. **Scorecard** — ten bars sorted by score, a dashed line at 6, each tagged with what
+1. **Masthead** — a sticky top bar (repo, mode, total; its section links are built by
+   the template script from every `<h2>`, so give each `<h2>` a 1–2 word `data-nav`
+   label), a one-line headline verdict, one sentence naming the single pattern behind
+   the scores, the total with a 0–100 meter, and a two-column split: what scores high
+   and why (green) next to what scores low and why (red), 3–4 short items each. Chips
+   for date, path, size, commits, and stacks. In overengineering mode, add chips for
+   repo kind, age, and history confidence. This split is where the report names the
+   pattern behind the scores.
+2. **Scorecard** — ten bars sorted by score, a tick at 6, each tagged with what
    enforces the principle (or what it lacks). A divider falls where the masthead's split
    falls. Each principle name links to its home strip.
 3. **Issue sections** — 2–4 themed sections, each a stack of **problem → solution
@@ -311,29 +314,42 @@ give it a URL is the user's.
 `assets/report-template.html` already carries a validated palette and every component
 the report needs. Reuse it as-is, in both modes. Do not restyle it.
 
-The status colors were checked with the `dataviz` skill's `validate_palette.js` in both
-modes and pass the lightness band, chroma floor, normal-vision floor, and contrast checks.
-The one CVD warning (green↔amber, ΔE 6.8–7.9) is legal **only because every score carries
-its number and a text band word** — color is never the sole encoding. If you change
-these hex values you must re-run the validator and keep the secondary encoding.
+The status colors were checked with the `dataviz` skill's `validate_palette.js`, all
+pairs, against the template's own surfaces (`--surface "#ffffff"` light, `"#151619"`
+dark). Both modes pass every check with no warnings: lightness band, chroma floor,
+normal-vision floor (ΔE 18.3 light / 17.4 dark), CVD separation (ΔE 8.1 / 8.5, target
+≥ 8), and 3:1 contrast. Every score still carries its number and a text band word —
+color is never the sole encoding. If you change these hex values, re-run the validator.
 
 | Role | Light | Dark |
 |---|---|---|
-| Strong / Proportionate (8–10) | `#1a8a5e` | `#3d9970` |
-| Adequate / Tolerable (6–7) | `#a8761f` | `#b8842a` |
-| Weak / Overengineered (0–5) | `#b83a4c` | `#d1495b` |
-| Surface | `#fcfcfb` | `#1a1a19` |
+| Strong / Proportionate (8–10) | `#0a9b78` | `#1db071` |
+| Adequate / Tolerable (6–7) | `#c4820f` | `#d37e01` |
+| Weak / Overengineered (0–5) | `#d6293e` | `#d92a45` |
+| Page surface | `#fbfbfc` | `#0e0f11` |
+| Panel surface | `#ffffff` | `#151619` |
 
-Two further color sets are in the template, and neither is used alone to carry meaning:
+The three status hexes above are **fills** (bars, squares, borders, dots). Colored
+**text** uses the darker `--good-ink` / `--warn-ink` / `--bad-ink` variants, which hold
+4.5:1 on every surface and tint; the `.txt-*` classes already point at them. Never set
+small text in a fill color.
 
+Three further color sets are in the template, and none is used alone to carry meaning:
+
+- **Lines** (`--good-line`, `--warn-line`, `--bad-line`) are the hairline borders of
+  tinted panels.
 - **Tints** (`--good-bg`, `--warn-bg`, `--bad-bg`) are panel backgrounds for problem and
-  solution sides. Each panel also carries a "Problem" or "Solution" label.
-- **Categories** (`--c1`–`--c5`, `--c0` for "other") color square groups by filename
+  solution sides. Each panel also carries a "Problem" or "Solution" label with a
+  diff-style − / + marker.
+- **Categories** (`--c1`–`--c5`: blue, pink, violet, orange, cyan; `--c0` for "other")
+  are validated as neighbors in that order (adjacent CVD ΔE ≥ 13.9 in both modes), so
+  assign them in order, never skipping. They color square groups by filename
   prefix or role. Every group is named with its count in a `.keys` legend next to it.
 
 Other constraints, all already in the template: self-contained (no external fonts,
-scripts, stylesheets, or images; one small inline script draws the squares and wires the
-Copy buttons); responds to `prefers-color-scheme` **and** to `:root[data-theme]` so a
+scripts, stylesheets, or images; one small inline script draws the squares, wires the
+Copy buttons, and builds the top-bar section links; icons and arrows are drawn in CSS,
+so `.arrow` divs stay empty); responds to `prefers-color-scheme` **and** to `:root[data-theme]` so a
 viewer toggle wins in both directions; every side-by-side layout collapses to one column
 under 760px, with the arrow turned downward, so the page body never scrolls
 horizontally.
