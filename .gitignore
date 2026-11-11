@@ -11,3 +11,8 @@ Thumbs.db
 
 # Output of test renders made with paper-cut-video from this repo
 videos/
+
+# Hook configs written by the Impeccable installer for other agent tools
+.codex/
+.cursor/
+.gemini/
